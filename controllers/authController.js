@@ -1,10 +1,9 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const asyncHandler = require("express-async-handler");
 
-// LOGIN (POST)
-const login = asyncHandler(async (req, res) => {
+// LOGIN
+const login = async (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
@@ -40,17 +39,17 @@ const login = asyncHandler(async (req, res) => {
 
   // Create secure cookie with refresh token
   res.cookie("jwt", refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "None",
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    httpOnly: true, //accessible only by web server
+    secure: true, //https
+    sameSite: "None", //cross-site cookie
+    maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
   });
 
   // Send accessToken containing username and roles
   res.json({ accessToken });
-});
+};
 
-// REFRESH (POST)
+// REFRESH
 const refresh = (req, res) => {
   const cookies = req.cookies;
 
@@ -61,7 +60,7 @@ const refresh = (req, res) => {
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
-    asyncHandler(async (err, decoded) => {
+    async (err, decoded) => {
       if (err) return res.status(403).json({ message: "Forbidden" });
 
       const foundUser = await User.findOne({
@@ -82,14 +81,14 @@ const refresh = (req, res) => {
       );
 
       res.json({ accessToken });
-    })
+    }
   );
 };
 
-// LOGOUT (POST)
+// LOGOUT
 const logout = (req, res) => {
   const cookies = req.cookies;
-  if (!cookies?.jwt) return res.sendStatus(204);
+  if (!cookies?.jwt) return res.sendStatus(204); //No content
   res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
   res.json({ message: "Cookie cleared" });
 };
