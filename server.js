@@ -14,6 +14,11 @@ const PORT = process.env.PORT || 3500;
 
 connectDB();
 
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
+
 app.use(logger);
 
 app.use(cors(corsOptions));
