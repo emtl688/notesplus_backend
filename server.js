@@ -14,9 +14,13 @@ const PORT = process.env.PORT || 3500;
 
 connectDB();
 
-app.use(logger);
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "https://mycrm-ericm.onrender.com"); // set the origin of your app
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
-app.use(cors(corsOptions));
+app.use(logger);
 
 app.use(express.json());
 
