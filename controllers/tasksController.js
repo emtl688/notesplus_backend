@@ -17,7 +17,7 @@ const getAllTasks = async (req, res) => {
     tasks.map(async (task) => {
       const user = await User.findById(task.user).lean().exec();
       const customer = await Customer.findById(task.customer).lean().exec();
-      return { ...task, username: user.username, customer: customer.name };
+      return { ...task, username: user.username, customer: customer._id, customerName: customer.name };
     })
   );
 
